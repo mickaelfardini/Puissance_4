@@ -1,6 +1,11 @@
 (function($) {
-$.fn.puissance_4 = function(width = 7, height = 6, couleur1 = "", couleur2 = "") {
-
+$.fn.puissance_4 = function(width = 7, height = 6, couleur1 = "yellow", couleur2 = "red") {
+	if (width >= 10) { width = 9} if (height >= 10) { height = 9}
+	$("head").append("<style></style>");
+	$("style").append("td{border:1px solid black;width:100px;height:100px}table{display:block;width:100%}"+
+		"tr{display:flex;width:100%}tbody{display:block;width:100%}.dot{height:90%;width:90%;border-radius:"+
+		"50%;border:4px solid black;display:inline-block}.yellow{background-color:"+couleur1+"}."+
+		"red{background-color:"+couleur2+"}");
 	var arr = new Array(), player = 1, count = 1, color = "yellow", win1 = 0, win2 = 0;
 	win1 = localStorage.getItem("player1") == null ? win1 : localStorage.getItem("player1");
 	win2 = localStorage.getItem("player2") == null ? win2 : localStorage.getItem("player2");
@@ -27,7 +32,10 @@ $.fn.puissance_4 = function(width = 7, height = 6, couleur1 = "", couleur2 = "")
 		if (lastcell < 11) { return false;}
 		if (arr[lastcell] == 0) {
 			arr[lastcell] = player;
-			$("#"+lastcell).html("<span class=\"dot "+color+"\"></span>");
+			$("#"+lastcell).html("<span col=\""+$("#"+lastcell).attr("col")+
+				"\" style=\"position:relative;top:-300px;\" id=\""+player+lastcell+
+				"\"class=\"dot "+color+"\"></span>");
+			$("#"+player+lastcell).animate({ "top": "0px" }, "fast" );
 			if(checkFour(lastcell)) { countWin(); return false;}
 			playerTurn();
 		} else {
