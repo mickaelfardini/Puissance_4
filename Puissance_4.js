@@ -2,8 +2,9 @@
 $.fn.puissance_4 = function(width = 7, height = 6, couleur1 = "yellow", couleur2 = "red") {
 	if (width >= 10) { width = 9} if (height >= 10) { height = 9}
 	$("head").append("<style></style>");
-	$("style").append("td{border:1px solid black;width:100px;height:100px}table{display:block;width:100%}"+
-		"tr{display:flex;width:100%}tbody{display:block;width:100%}.dot{height:90%;width:90%;border-radius:"+
+	$("style").append("table{border:1px solid black}td{margin:4px;background-color:white;border:1px solid black;width:100px;height:100px;border-top-left-radius: 50px;"+
+		"border-top-right-radius: 50px;border-bottom-right-radius: 50px;border-bottom-left-radius: 50px;;}"+
+		"tr{background-color:lightblue;display:flex;width:100%}tbody{display:block;width:100%}.dot{left:-2px;height:95%;width:95%;border-radius:"+
 		"50%;border:4px solid black;display:inline-block}.yellow{background-color:"+couleur1+"}."+
 		"red{background-color:"+couleur2+"}");
 	var arr = new Array(), player = 1, count = 1, color = "yellow", win1 = 0, win2 = 0;
@@ -35,7 +36,7 @@ $.fn.puissance_4 = function(width = 7, height = 6, couleur1 = "yellow", couleur2
 			$("#"+lastcell).html("<span col=\""+$("#"+lastcell).attr("col")+
 				"\" style=\"position:relative;top:-300px;\" id=\""+player+lastcell+
 				"\"class=\"dot "+color+"\"></span>");
-			$("#"+player+lastcell).animate({ "top": "0px" }, "fast" );
+			$("#"+player+lastcell).animate({ "top": "-2px" }, "fast" );
 			if(checkFour(lastcell)) { countWin(); return false;}
 			playerTurn();
 		} else {
