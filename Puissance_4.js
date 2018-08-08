@@ -1,35 +1,60 @@
 (function($) {
-$.fn.puissance_4 = function(width = 7, height = 6, couleur1 = "yellow", couleur2 = "red") {
+$.fn.puissance_4 = function(width = 7, height = 6, couleur1 = "yellow", couleur2 = "red", maxRound = 3) {
 	if (width >= 10) { width = 9} if (height >= 10) { height = 9}
+	if(couleur1 == couleur2) {couleur1 = "yellow"; couleur2 = "red";}
 	$("head").append("<style></style>");
-	$("style").append("table{border:1px solid black}td{margin:4px;background-color:white;border:1px solid black;width:100px;height:100px;border-top-left-radius: 50px;"+
+	$("style").append("table{border:1px solid black;border-radius:5px}td{margin:4px;background-color:white;"+
+		"border:1px solid black;width:100px;height:100px;border-top-left-radius: 50px;"+
 		"border-top-right-radius: 50px;border-bottom-right-radius: 50px;border-bottom-left-radius: 50px;;}"+
-		"tr{background-color:lightblue;display:flex;width:100%}tbody{display:block;width:100%}.dot{left:-2px;height:95%;width:95%;border-radius:"+
-		"50%;border:4px solid black;display:inline-block}.yellow{background-color:"+couleur1+"}."+
-		"red{background-color:"+couleur2+"}");
-	var arr = new Array(), player = 1, count = 1, color = "yellow", win1 = 0, win2 = 0;
+		"tr{background-color:lightblue;display:flex;width:100%}tbody{display:block;width:100%}.dot{left:-2px;"+
+		"height:95%;width:95%;border-radius:50%;border:4px solid black;display:inline-block}.yellow{"+
+		"background-color:"+couleur1+"}.red{background-color:"+couleur2+"}");
+	var arr = new Array(), player = 1, count = 1, color = "yellow", win1 = 0, win2 = 0, roundWon = false, cancelCell;
 	win1 = localStorage.getItem("player1") == null ? win1 : localStorage.getItem("player1");
 	win2 = localStorage.getItem("player2") == null ? win2 : localStorage.getItem("player2");
-	console.log(localStorage, win1, win2);
-	$("div").append("<table></table>");
+	$("div").append("<table id='p4'></table>");
 	$("div").append("<score><player1>Player 1 : "+win1+"</player1><br><player2>Player 2 : "+win2+"</player2></score>");
 
 	for (var h = 1; h <= height; h++) {
-		$("table").append("<tr>");
+		$("#p4").append("<tr>");
 		for (var w = 1; w <= width; w++) {
 			$("tr:last").append("<td id=\""+h + w +"\" row=\""+h+"\" col=\""+w+"\"></td>");
 			arr[h.toString()+w.toString()] = 0;
 		}
-		$("table").append("</tr>");
+		$("#p4").append("</tr>");
 	}
+	$("#p4").before("<h1 style='font-family:\"Georgia\"'>Puissance 4</h1>")
+	$("#p4").before("<h3 id='info' style='font-family:\"Georgia\"'>Tour du joueur "+player+"</h3>");
+	$("#p4").before("<button id='replay' style='border-radius:5px; background-color:skyblue'>Rejouer</button>"+
+					"<button id='cancel' style='border-radius:5px; background-color:skyblue'>Cancel</button>"+
+					"<button id='reset' style='border-radius:5px; background-color:skyblue'>Reset Score</button>")
 
-	$(document).click(function(e) {
+	$("table").click(function(e) {
+		if (roundWon) {return false;}
 		lastcell = height.toString() + $(e.target).attr("col").toString();
 		dropToken(lastcell);
 	});
 
+	$("#replay").click(() => {
+		$("div").html("");
+		arr = [];
+		$("div").puissance_4(width, height, couleur1, couleur2, maxRound);
+		roundWon = !roundWon;
+	});
+	$("#cancel").click(() => {
+		arr[cancelCell] = 0;
+		playerTurn();
+		$("#"+cancelCell).html("");
+	});
+	$("#reset").click(() => {
+		localStorage.setItem('player1', 0);
+		localStorage.setItem('player2', 0);
+		$("#replay").click();
+	});
+
 	function dropToken(lastcell) {
 		lastcell = parseInt(lastcell);
+		cancelCell = lastcell;
 		if (lastcell < 11) { return false;}
 		if (arr[lastcell] == 0) {
 			arr[lastcell] = player;
@@ -59,7 +84,7 @@ $.fn.puissance_4 = function(width = 7, height = 6, couleur1 = "yellow", couleur2
 		return false;
 	}
 
-	function checkFour(lastcell, dir = "tl") {
+	function checkFour(lastcell) {
 		var alignFour = new Array();
 		// Diag Left to Right
 		for (var i = -33; i <= 33; i = i +11) {
@@ -89,34 +114,36 @@ $.fn.puissance_4 = function(width = 7, height = 6, couleur1 = "yellow", couleur2
 	function playerTurn() {
 		player = player == 1 ? 2 : 1;
 		color = color == "yellow" ? "red" : "yellow";
+		$("#info").html("Tour du joueur "+player);
 	}
 
 	function countWin() {
 		if (player == 1) {
 			win1++;
 			$("player1").html("Player 1 : "+win1);
-			if (win1 >= 3) {
-				$("div").prepend("<h1>Le joueur "+player+" a gagné.");
+			if (win1 >= maxRound) {
+				$("#info").html("Le joueur "+player+" a gagné la game.");
 				localStorage.setItem('player1', 0);
 				localStorage.setItem('player2', 0);
+				roundWon = 1;
 				return 1;
 			}
 		} else {
 			win2++;
 			$("player2").html("Player 2 : "+win2);
-			if (win2 >= 3) {
-				$("div").prepend("<h1>Le joueur "+player+" a gagné.");
+			if (win2 >= maxRound) {
+				$("#info").html("Le joueur "+player+" a gagné la game.");
 				localStorage.setItem('player1', 0);
 				localStorage.setItem('player2', 0);
+				roundWon = 1;
 				return 1;
 			}
 		}
+		roundWon = true;
 		localStorage.setItem('player1', win1);
 		localStorage.setItem('player2', win2);
-		$("div").html("");
-		$("div").prepend("<h1>Le joueur "+player+" a gagné.");
-		arr = [];
-		$("div").puissance_4();
+		$("#info").html("Le joueur "+player+" a gagné la manche.");
+		return 1;
 	}
 };
 })(jQuery);
