@@ -1,5 +1,6 @@
 (function($) {
-$.fn.puissance_4 = function(width = 7, height = 6, couleur1 = "yellow", couleur2 = "red", maxRound = 3) {
+$.fn.puissance_4 = function(width = 7, height = 6, player1 = "Player 1", player2 = "Player 2", couleur1 = "yellow", 
+							couleur2 = "red", maxRound = 3) {
 	if (width >= 10) { width = 9} if (height >= 10) { height = 9}
 	if(couleur1 == couleur2) {couleur1 = "yellow"; couleur2 = "red";}
 	$("head").append("<style></style>");
@@ -24,7 +25,7 @@ $.fn.puissance_4 = function(width = 7, height = 6, couleur1 = "yellow", couleur2
 		$("#p4").append("</tr>");
 	}
 	$("#p4").before("<h1 style='font-family:\"Georgia\"'>Puissance 4</h1>")
-	$("#p4").before("<h3 id='info' style='font-family:\"Georgia\"'>Tour du joueur "+player+"</h3>");
+	$("#p4").before("<h3 id='info' style='font-family:\"Georgia\"'>Tour du joueur "+(player == 1 ? player1 : player2)+"</h3>");
 	$("#p4").before("<button id='replay' style='border-radius:5px; background-color:skyblue'>Rejouer</button>"+
 					"<button id='cancel' style='border-radius:5px; background-color:skyblue'>Cancel</button>"+
 					"<button id='reset' style='border-radius:5px; background-color:skyblue'>Reset Score</button>")
@@ -112,9 +113,19 @@ $.fn.puissance_4 = function(width = 7, height = 6, couleur1 = "yellow", couleur2
 	}
 
 	function playerTurn() {
+		var count = 0;
+		$.each(arr, (k, v) => {
+			if (v == 0) {
+				count++;
+			}
+		});
+		if (count == 0) {
+			$("#info").html("Match nul");
+			return false;
+		}
 		player = player == 1 ? 2 : 1;
 		color = color == "yellow" ? "red" : "yellow";
-		$("#info").html("Tour du joueur "+player);
+		$("#info").html("Tour du joueur "+(player == 1 ? player1 : player2));
 	}
 
 	function countWin() {
@@ -122,7 +133,7 @@ $.fn.puissance_4 = function(width = 7, height = 6, couleur1 = "yellow", couleur2
 			win1++;
 			$("player1").html("Player 1 : "+win1);
 			if (win1 >= maxRound) {
-				$("#info").html("Le joueur "+player+" a gagné la game.");
+				$("#info").html("Le joueur "+(player == 1 ? player1 : player2)+" a gagné la game.");
 				localStorage.setItem('player1', 0);
 				localStorage.setItem('player2', 0);
 				roundWon = 1;
@@ -132,7 +143,7 @@ $.fn.puissance_4 = function(width = 7, height = 6, couleur1 = "yellow", couleur2
 			win2++;
 			$("player2").html("Player 2 : "+win2);
 			if (win2 >= maxRound) {
-				$("#info").html("Le joueur "+player+" a gagné la game.");
+				$("#info").html("Le joueur "+(player == 1 ? player1 : player2)+" a gagné la game.");
 				localStorage.setItem('player1', 0);
 				localStorage.setItem('player2', 0);
 				roundWon = 1;
@@ -142,12 +153,13 @@ $.fn.puissance_4 = function(width = 7, height = 6, couleur1 = "yellow", couleur2
 		roundWon = true;
 		localStorage.setItem('player1', win1);
 		localStorage.setItem('player2', win2);
-		$("#info").html("Le joueur "+player+" a gagné la manche.");
+		$("#info").html("Le joueur "+(player == 1 ? player1 : player2)+" a gagné la manche.");
 		return 1;
 	}
 };
 })(jQuery);
 
 $(document).ready(function () {
-	$("div").puissance_4();	
+	// Demarrage du plugin pour soutenance
+	$("div").puissance_4(7,6,"Paul");
 });
